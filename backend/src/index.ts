@@ -1,7 +1,10 @@
 import "reflect-metadata";
 import express from "express";
 import cors from "cors";
+import { errors as celebrateErrors } from "celebrate";
 import { AppDataSource } from "./data-source";
+import paymentTypeRoutes from "./routes/paymentType.routes";
+import paymentRoutes from "./routes/payment.routes";
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -12,6 +15,24 @@ app.use(express.json());
 app.get("/", (_req, res) => {
   res.json({ message: `Servidor rodando na porta ${port}` });
 });
+
+// Rotas de tipos de pagamento
+app.use("/payment-types", paymentTypeRoutes);
+app.use("/payments", paymentRoutes);
+
+// Middleware de erros do celebrate (deve vir DEPOIS das rotas)
+app.use(celebrateErrors());
+
+// Fallback genérico de erros
+app.use(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  (err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    console.error(err);
+    return res.status(500).json({
+      message: "Erro interno do servidor."
+    });
+  }
+);
 
 async function logTableStatus() {
   const queryRunner = AppDataSource.createQueryRunner();
