@@ -1,0 +1,76 @@
+services:
+  mysql:
+    image: mysql:8
+    container_name: mysql_cartorio
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: cartorio_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    networks:
+      - app_network
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build:
+      context: ./backend
+    container_name: cartorio-backend
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      # Variáveis típicas para TypeORM (ajuste para o que você for usar no projeto)
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: cartorio_db
+
+      # Se você preferir uma única URL para o TypeORM (por ex. usando DataSourceOptions com url)
+      # DATABASE_URL: mysql://user:password@mysql:3306/cartorio_db
+    ports:
+      - "4000:4000"
+    networks:
+      - app_network
+    # Em produção pura, normalmente NÃO usamos volumes de código;
+    # se quiser modo dev com hot-reload, a gente monta depois um compose.override.
+    # Aqui vou deixar sem volumes para ficar estável com os Dockerfiles de build.
+    # volumes:
+    #   - ./backend:/app
+    #   - /app/node_modules
+    command: >
+      sh -c "node ./node_modules/typeorm/cli.js migration:run -d dist/data-source.js && node ./dist/index.js"
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: cartorio-frontend
+    restart: always
+    depends_on:
+      - backend
+    environment:
+      NODE_ENV: production
+      # URL da API para o frontend (ajuste conforme uso no Next)
+      NEXT_PUBLIC_API_BASE_URL: http://backend:4000
+    ports:
+      - "3000:3000"
+    networks:
+      - app_network
+    # Mesma lógica: sem volumes em modo produção.
+    # volumes:
+    #   - ./frontend:/app
+    #   - /app/node_modules
+    command: ["npm", "start"]
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
