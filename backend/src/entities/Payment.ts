@@ -33,6 +33,9 @@ export class Payment {
   @Column({ type: "decimal", precision: 15, scale: 2 })
   amount!: number;
 
+  @Column({ name: "receipt_path", type: "varchar", length: 255, nullable: true })
+  receiptPath?: string | null;
+
   // futuro: campo opcional para comprovante
   // @Column({ name: "receipt_path", type: "varchar", length: 500, nullable: true })
   // receiptPath?: string;

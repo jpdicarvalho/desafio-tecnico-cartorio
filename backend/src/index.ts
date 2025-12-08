@@ -23,38 +23,137 @@ app.use("/payments", paymentRoutes);
 // Middleware de erros do celebrate (deve vir DEPOIS das rotas)
 app.use(celebrateErrors());
 
-// Fallback genérico de erros
+// Fallback de erros
 app.use(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   (err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
     console.error(err);
-    return res.status(500).json({
-      message: "Erro interno do servidor."
-    });
+
+    const status =
+      err?.statusCode && Number(err.statusCode) >= 400
+        ? Number(err.statusCode)
+        : 500;
+
+    const message =
+      status === 500
+        ? "Erro interno do servidor."
+        : err?.message || "Erro na requisição.";
+
+    return res.status(status).json({ message });
   }
 );
 
 async function logTableStatus() {
   const queryRunner = AppDataSource.createQueryRunner();
+
+  // Definição das tabelas e colunas esperadas
+  const dbName = process.env.DB_NAME || "cartorio_db";
+
+  const tablesToCheck: {
+    name: string;
+    expectedColumns?: string[];
+  }[] = [
+    {
+      name: "payment_types",
+      expectedColumns: [
+        "id",
+        "name",
+        "created_at",
+        "updated_at",
+      ],
+    },
+    {
+      name: "payments",
+      expectedColumns: [
+        "id",
+        "date",
+        "payment_type_id",
+        "description",
+        "amount",
+        "receipt_path",
+        "created_at",
+        "updated_at",
+      ],
+    },
+  ];
+
   try {
     await queryRunner.connect();
+    console.log("🔍 Verificando status das tabelas e colunas...\n");
 
-    const tablesToCheck = ["payment_types", "payments"];
+    for (const table of tablesToCheck) {
+      const { name: tableName, expectedColumns } = table;
 
-    for (const tableName of tablesToCheck) {
-      const result = await queryRunner.query(
-        `SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?`,
-        [process.env.DB_NAME || "cartorio_db", tableName]
+      // 1) Verifica se a tabela existe
+      const tableResult = await queryRunner.query(
+        `SELECT TABLE_NAME 
+           FROM information_schema.TABLES 
+          WHERE TABLE_SCHEMA = ? 
+            AND TABLE_NAME = ?`,
+        [dbName, tableName]
       );
 
-      if (result.length > 0) {
-        console.log(`✅ Tabela '${tableName}' existente no banco.`);
-      } else {
-        console.warn(`⚠️ Tabela '${tableName}' NÃO encontrada no banco.`);
+      if (tableResult.length === 0) {
+        console.warn(`⚠️  Tabela '${tableName}' NÃO encontrada no banco.`);
+        continue;
       }
+
+      console.log(`✅ Tabela '${tableName}' existe.`);
+
+      // 2) Se não definimos colunas esperadas, segue pra próxima
+      if (!expectedColumns || expectedColumns.length === 0) {
+        continue;
+      }
+
+      // 3) Buscar colunas reais da tabela
+      const columnsResult = await queryRunner.query(
+        `SELECT COLUMN_NAME 
+           FROM information_schema.COLUMNS 
+          WHERE TABLE_SCHEMA = ? 
+            AND TABLE_NAME = ?`,
+        [dbName, tableName]
+      );
+
+      const existingColumns = columnsResult.map(
+        (row: any) => row.COLUMN_NAME as string
+      );
+
+      // 4) Verificar colunas que deveriam existir e não existem
+      const missingColumns = expectedColumns.filter(
+        (col: any) => !existingColumns.includes(col)
+      );
+
+      // 5) (Opcional) colunas “extras” não previstas
+      const extraColumns = existingColumns.filter(
+        (col: any) => !expectedColumns.includes(col)
+      );
+
+      if (missingColumns.length === 0) {
+        console.log(
+          `   ✅ Todas as colunas esperadas existem em '${tableName}'.`
+        );
+      } else {
+        console.warn(
+          `   ⚠️  Colunas faltando em '${tableName}': ${missingColumns.join(
+            ", "
+          )}`
+        );
+      }
+
+      if (extraColumns.length > 0) {
+        console.log(
+          `   ℹ️  Colunas adicionais encontradas em '${tableName}': ${extraColumns.join(
+            ", "
+          )}`
+        );
+      }
+
+      console.log(""); // linha em branco pra separar
     }
+
+    console.log("🔎 Verificação de schema concluída.\n");
   } catch (error) {
-    console.error("❌ Erro ao verificar tabelas:", error);
+    console.error("❌ Erro ao verificar tabelas/colunas:", error);
   } finally {
     await queryRunner.release();
   }
