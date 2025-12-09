@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Cartório - Painel de Pagamentos",
+  title: "Cartório 1º ofício de Notas e Registro de Imóveis de Santarém - PA",
   description:
     "Gestão de pagamentos do Cartório 1º Ofício de Notas e Registro de Imóveis de Santarém - PA",
 };
@@ -23,8 +24,14 @@ export default function RootLayout({
               <div className="header-brand">
                 {/* Espaço reservado para a logo */}
                 <div className="brand-logo-placeholder">
-                  {/* Quando tiver logo, substitua por <Image /> ou <img /> */}
-                  C1
+                  <Image
+                    src="/logo-cartorio.png"
+                    alt="Cartório 1º Ofício - Notas e Registro de Imóveis"
+                    width={52}
+                    height={52}
+                    className="brand-logo"
+                    priority
+                  />
                 </div>
 
                 <div className="brand-text">

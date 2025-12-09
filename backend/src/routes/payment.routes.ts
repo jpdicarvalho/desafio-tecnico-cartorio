@@ -5,6 +5,7 @@ import { AppDataSource } from "../data-source";
 import { Payment } from "../entities/Payment";
 import { PaymentType } from "../entities/PaymentType";
 import { PaymentService } from "../services/payment.service";
+import { upload } from "../config/multer";
 
 const router = Router();
 
@@ -92,6 +93,50 @@ router.post(
       });
 
       return res.status(201).json(paymentWithType ?? payment);
+    } catch (error) {
+      return next(error);
+    }
+  }
+);
+
+// POST /payments/:id/receipt - upload/atualizar comprovante
+router.post(
+  "/:id/receipt",
+  upload.single("receipt"),
+  async (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+
+      if (!id || Number.isNaN(id) || id <= 0) {
+        const error: any = new Error("ID de pagamento inválido.");
+        error.statusCode = 400;
+        throw error;
+      }
+
+      const payment = await paymentRepository.findOne({ where: { id } });
+
+      if (!payment) {
+        const error: any = new Error("Pagamento não encontrado.");
+        error.statusCode = 404;
+        throw error;
+      }
+
+      if (!req.file) {
+        const error: any = new Error("Nenhum arquivo enviado.");
+        error.statusCode = 400;
+        throw error;
+      }
+
+      // vamos guardar um caminho relativo simples, ex: "receipts/arquivo-123.pdf"
+      const relativePath = `receipts/${req.file.filename}`;
+
+      payment.receiptPath = relativePath;
+      await paymentRepository.save(payment);
+
+      return res.status(200).json({
+        message: "Comprovante anexado com sucesso.",
+        receiptPath: relativePath,
+      });
     } catch (error) {
       return next(error);
     }

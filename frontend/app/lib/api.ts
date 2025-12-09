@@ -17,6 +17,7 @@ export type PaymentDTO = {
   createdAt?: string;
   updatedAt?: string;
   paymentType?: PaymentTypeDTO;
+  receiptPath?: string | null;
 };
 
 export type PaymentFilters = {
@@ -39,6 +40,11 @@ export type PaymentUpdatePayload = {
   description: string;
   amount: number;
 };
+
+export function getReceiptUrl(receiptPath: string): string {
+  // backend salva "receipts/arquivo-xxx.ext"
+  return `${API_BASE_URL}/uploads/${receiptPath.replace(/^uploads[\\/]/, "")}`;
+}
 
 function buildQueryString(filters: PaymentFilters): string {
   const params = new URLSearchParams();
@@ -120,6 +126,21 @@ export const api = {
     if (!res.ok) {
       await handleResponse(res); // vai lançar erro com message
     }
+  },
+
+  async uploadReceipt(
+    paymentId: number,
+    file: File
+  ): Promise<{ message: string; receiptPath: string }> {
+    const formData = new FormData();
+    formData.append("receipt", file); // mesmo campo usado no Multer
+
+    const res = await fetch(`${API_BASE_URL}/payments/${paymentId}/receipt`, {
+      method: "POST",
+      body: formData,
+    });
+
+    return handleResponse<{ message: string; receiptPath: string }>(res);
   },
   // depois adicionaremos create/update/delete aqui
 };

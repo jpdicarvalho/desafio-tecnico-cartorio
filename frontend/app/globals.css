@@ -57,22 +57,6 @@ body {
   gap: 0.75rem;
 }
 
-.brand-logo-placeholder {
-  height: 44px;
-  width: 44px;
-  border-radius: 14px;
-  border: 1px solid rgba(51, 65, 85, 0.9);
-  background: radial-gradient(circle at 30% 20%, #1d4ed8, #020617 65%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 650;
-  font-size: 1rem;
-  color: #dbeafe;
-  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.9),
-    0 12px 30px rgba(15, 23, 42, 0.95);
-}
-
 /* Quando tiver logo, troque por .brand-logo-img */
 .brand-logo-placeholder img {
   max-width: 100%;
@@ -296,9 +280,11 @@ body {
 }
 
 .btn-ghost-small {
-  padding: 0.3rem 0.7rem;
+  padding: 0.5rem 0.7rem;
   font-size: 0.75rem;
   border-radius: 999px;
+  width: 100%;
+  margin-top: 10px;
 }
 
 .btn-ghost:hover {
@@ -310,12 +296,6 @@ body {
   display: inline-flex;
   gap: 0.25rem;
   justify-content: flex-end;
-}
-
-.btn-ghost-small {
-  padding: 0.3rem 0.7rem;
-  font-size: 0.75rem;
-  border-radius: 999px;
 }
 
 /* Variante de perigo para exclusão */
@@ -759,4 +739,78 @@ body {
   font-size: 1.25rem;
   font-weight: 600;
   color: #f9fafb;
+}
+
+/* Estilo do input de upload de arquivos */
+.details-divider {
+  margin: 1rem 0 0.75rem;
+  border-top: 1px solid rgba(55, 65, 81, 0.9);
+}
+
+/* container do bloco de comprovante */
+.details-receipt {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* cabeçalho: label + link "Abrir comprovante" ou "Ver comprovante atual" */
+.details-receipt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* label reaproveita o estilo de outros labels de detalhes */
+.details-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #d1d5db;
+}
+
+/* link para abrir/ver comprovante */
+.details-receipt-link {
+  font-size: 0.8rem;
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+.details-receipt-link:hover {
+  text-decoration: underline;
+}
+
+/* texto quando não há comprovante */
+.details-receipt-empty {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+/* parte de upload: usada tanto no form (principal) quanto se você quiser em detalhes */
+.details-receipt-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+/* botão de anexar dentro do bloco de comprovante */
+.btn-attach {
+  align-self: flex-start;
+}
+
+/* nome do arquivo selecionado no form */
+.details-receipt-selected {
+  font-size: 0.8rem;
+  color: #e5e7eb;
+}
+
+/* helper text abaixo do campo de comprovante (form) */
+.form-help {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+/* alerta compacto (se usar em algum lugar) */
+.alert-error-small {
+  padding: 0.35rem 0.5rem;
+  font-size: 0.75rem;
 }

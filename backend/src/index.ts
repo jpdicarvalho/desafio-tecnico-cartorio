@@ -5,6 +5,7 @@ import { errors as celebrateErrors } from "celebrate";
 import { AppDataSource } from "./data-source";
 import paymentTypeRoutes from "./routes/paymentType.routes";
 import paymentRoutes from "./routes/payment.routes";
+import path from "path";
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -19,6 +20,9 @@ app.get("/", (_req, res) => {
 // Rotas de tipos de pagamento
 app.use("/payment-types", paymentTypeRoutes);
 app.use("/payments", paymentRoutes);
+
+const uploadsRoot = path.resolve(__dirname, "..", "uploads");
+app.use("/uploads", express.static(uploadsRoot));
 
 // Middleware de erros do celebrate (deve vir DEPOIS das rotas)
 app.use(celebrateErrors());

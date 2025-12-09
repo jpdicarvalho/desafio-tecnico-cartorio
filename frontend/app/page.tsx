@@ -7,6 +7,7 @@ import {
   PaymentFilters,
   PaymentTypeDTO,
   PaymentCreatePayload,
+  getReceiptUrl
 } from "./lib/api";
 
 type TypeFilterDropdownProps = {
@@ -100,6 +101,8 @@ export default function HomePage() {
     description: "",
     amount: 0,
   });
+
+  const [formReceiptFile, setFormReceiptFile] = useState<File | null>(null);
 
   const [editingPaymentId, setEditingPaymentId] = useState<number | null>(null);
   const [deletingPaymentId, setDeletingPaymentId] = useState<number | null>(null);
@@ -205,6 +208,7 @@ export default function HomePage() {
       description: "",
       amount: 0,
     });
+    setFormReceiptFile(null);
     setEditingPaymentId(null);
     setFormError(null);
     setIsModalOpen(true);
@@ -218,6 +222,7 @@ export default function HomePage() {
       description: payment.description,
       amount: payment.amount,
     });
+    setFormReceiptFile(null);
     setEditingPaymentId(payment.id);
     setFormError(null);
     setIsModalOpen(true);
@@ -289,15 +294,36 @@ export default function HomePage() {
     try {
       setIsSaving(true);
 
+      let savedPayment: PaymentDTO;
+
       if (editingPaymentId == null) {
         // criação
-        await api.createPayment(formData);
+        savedPayment = await api.createPayment(formData);
       } else {
         // edição
-        await api.updatePayment({
+        savedPayment = await api.updatePayment({
           id: editingPaymentId,
           ...formData,
         });
+      }
+
+      // Se tiver arquivo de comprovante, faz upload agora
+      if (formReceiptFile) {
+        try {
+          const { receiptPath } = await api.uploadReceipt(
+            savedPayment.id,
+            formReceiptFile
+          );
+          // atualiza receiptPath em memória (opcional, já que vamos recarregar a lista)
+          savedPayment = { ...savedPayment, receiptPath };
+        } catch (uploadError: any) {
+          console.error(uploadError);
+          // Se quiser, pode não bloquear o fluxo inteiro por falha no upload
+          setFormError(
+            uploadError?.message ||
+              "Pagamento salvo, mas houve erro ao enviar o comprovante."
+          );
+        }
       }
 
       // Recarrega a lista com os filtros atuais
@@ -306,6 +332,7 @@ export default function HomePage() {
 
       setIsModalOpen(false);
       setEditingPaymentId(null);
+      setFormReceiptFile(null);
     } catch (error: any) {
       console.error(error);
       setFormError(
@@ -480,7 +507,7 @@ export default function HomePage() {
                     <td>{formatDate(p.date)}</td>
                     <td>{p.paymentType?.name || "—"}</td>
                     <td>{p.description}</td>
-                    <td className="table-col-right">{formatCurrency(Number(p.amount))}</td>
+                    <td className="table-col-right">R$ {formatCurrency(Number(p.amount))}</td>
                     <td className="table-col-right">
                       <div className="table-actions">
                         <button
@@ -594,6 +621,52 @@ export default function HomePage() {
                 />
               </div>
 
+              <div className="form-field">
+                <div className="details-divider" />
+
+                <div className="details-receipt">
+                  <div className="details-receipt-header">
+                    <span className="details-label">Comprovante (opcional)</span>
+
+                    {/* Para quando estiver editando e já houver comprovante */}
+                    {editingPaymentId != null && selectedPayment?.id === editingPaymentId && selectedPayment.receiptPath && (
+                      <a
+                        href={getReceiptUrl(selectedPayment.receiptPath)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="details-receipt-link"
+                      >
+                        Ver comprovante atual
+                      </a>
+                    )}
+                  </div>
+
+                  <div className="details-receipt-upload">
+                    <small className="form-help">
+                      Aceita PDF, PNG ou JPG. Tamanho máximo 5MB.
+                    </small>
+                    <label className="btn btn-ghost btn-ghost-small btn-attach">
+                      Selecionar arquivo
+                      <input
+                        type="file"
+                        accept=".pdf,image/png,image/jpeg"
+                        style={{ display: "none" }}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] || null;
+                          setFormReceiptFile(file);
+                        }}
+                      />
+                    </label>
+
+                    {formReceiptFile && (
+                      <span className="details-receipt-selected">
+                        Arquivo selecionado: {formReceiptFile.name}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               {formError && (
                 <div className="alert alert-error">
                   <span>{formError}</span>
@@ -700,6 +773,30 @@ export default function HomePage() {
                     </span>
                   </div>
                 )}
+              </div>
+
+              {/* Bloco de comprovante */}
+              <div className="details-divider" />
+
+              <div className="details-receipt">
+                <div className="details-receipt-header">
+                  <span className="details-label">Comprovante</span>
+
+                  {selectedPayment.receiptPath ? (
+                    <a
+                      href={getReceiptUrl(selectedPayment.receiptPath)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="details-receipt-link"
+                    >
+                      Abrir comprovante
+                    </a>
+                  ) : (
+                    <span className="details-receipt-empty">
+                      Nenhum comprovante anexado.
+                    </span>
+                  )}
+                </div>
               </div>
 
               {detailsMode === "delete" && (
