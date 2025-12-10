@@ -1,0 +1,157 @@
+/* Página Pagamentos */
+
+.page-root {
+  padding: 1.25rem 1.25rem 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid rgba(30, 64, 175, 0.35);
+}
+
+@media (min-width: 640px) {
+  .page-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.page-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #f9fafb;
+}
+
+.page-subtitle {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.page-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Filtros */
+.filters {
+  margin-top: 1.2rem;
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 0.75rem;
+  font-size: 0.85rem;
+}
+
+@media (min-width: 768px) {
+  .filters {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.filter-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+}
+
+.filter-field-actions {
+  display: flex;
+  align-items: flex-end;
+}
+
+/* Resumo do período */
+
+.summary-section {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.summary-card {
+  border-radius: 1rem;
+  border: 1px solid rgba(75, 85, 99, 0.8);
+  background: radial-gradient(
+      circle at top left,
+      rgba(96, 165, 250, 0.08),
+      transparent 60%
+    ),
+    rgba(17, 24, 39, 0.9);
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.summary-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.summary-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e5e7eb;
+}
+
+.summary-subtitle {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .summary-content {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.summary-item-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9ca3af;
+}
+
+.summary-item-value {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #e5e7eb;
+}
+
+.summary-item-value-strong {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #f9fafb;
+}

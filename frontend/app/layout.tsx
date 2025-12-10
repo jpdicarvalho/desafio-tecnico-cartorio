@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import "./globals.css";
+
+import "./styles/globals.css";
+import "./styles/header.css";
+import "./styles/page.css";
+import "./styles/table.css";
+import "./styles/modal.css";
+import "./styles/dropdown.css";
+import "./styles/details.css";
+import "./styles/layout.css";
 
 export const metadata: Metadata = {
   title: "Cartório 1º ofício de Notas e Registro de Imóveis de Santarém - PA",
@@ -17,12 +25,9 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body className="body-root">
         <div className="app-shell">
-          {/* Header */}
           <header className="app-header">
             <div className="app-header-inner">
-              {/* Logo + Nome do cartório */}
               <div className="header-brand">
-                {/* Espaço reservado para a logo */}
                 <div className="brand-logo-placeholder">
                   <Image
                     src="/logo-cartorio.png"

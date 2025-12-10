@@ -1,0 +1,113 @@
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+@media (min-width: 520px) {
+  .details-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.details-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.details-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.details-value {
+  font-size: 0.9rem;
+  color: #e5e7eb;
+  word-break: break-word;
+}
+
+.details-value-strong {
+  font-weight: 600;
+  color: #f9fafb;
+}
+
+.details-warning {
+  margin-top: 1rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(248, 113, 113, 0.8);
+  background: rgba(127, 29, 29, 0.8);
+  color: #fee2e2;
+  font-size: 0.8rem;
+}
+
+.details-divider {
+  margin: 1rem 0 0.75rem;
+  border-top: 1px solid rgba(55, 65, 81, 0.9);
+}
+
+/* container do bloco de comprovante */
+.details-receipt {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* cabeçalho: label + link "Abrir comprovante" ou "Ver comprovante atual" */
+.details-receipt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* label reaproveita o estilo de outros labels de detalhes */
+.details-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #d1d5db;
+}
+
+/* link para abrir/ver comprovante */
+.details-receipt-link {
+  font-size: 0.8rem;
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+.details-receipt-link:hover {
+  text-decoration: underline;
+}
+
+/* texto quando não há comprovante */
+.details-receipt-empty {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+/* parte de upload: usada tanto no form (principal) quanto se você quiser em detalhes */
+.details-receipt-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+/* botão de anexar dentro do bloco de comprovante */
+.btn-attach {
+  align-self: flex-start;
+}
+
+/* nome do arquivo selecionado no form */
+.details-receipt-selected {
+  font-size: 0.8rem;
+  color: #e5e7eb;
+}
+
+/* helper text abaixo do campo de comprovante (form) */
+.form-help {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}

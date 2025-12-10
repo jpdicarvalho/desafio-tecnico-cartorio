@@ -1,0 +1,7 @@
+{
+    "scripts": {
+        "test:docker": "docker-compose exec -T backend sh -c \"npm run test\"",
+        "start": "docker-compose up --build",
+        "reset": "docker-compose down -v && docker-compose up --build"
+    }
+}

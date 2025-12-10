@@ -1,51 +1,8 @@
+// src/index.ts
 import "reflect-metadata";
-import express from "express";
-import cors from "cors";
-import { errors as celebrateErrors } from "celebrate";
 import { AppDataSource } from "./data-source";
-import paymentTypeRoutes from "./routes/paymentType.routes";
-import paymentRoutes from "./routes/payment.routes";
-import path from "path";
-
-const app = express();
-const port = process.env.PORT || 4000;
-
-app.use(cors());
-app.use(express.json());
-
-app.get("/", (_req, res) => {
-  res.json({ message: `Servidor rodando na porta ${port}` });
-});
-
-// Rotas de tipos de pagamento
-app.use("/payment-types", paymentTypeRoutes);
-app.use("/payments", paymentRoutes);
-
-const uploadsRoot = path.resolve(__dirname, "..", "uploads");
-app.use("/uploads", express.static(uploadsRoot));
-
-// Middleware de erros do celebrate (deve vir DEPOIS das rotas)
-app.use(celebrateErrors());
-
-// Fallback de erros
-app.use(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  (err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-    console.error(err);
-
-    const status =
-      err?.statusCode && Number(err.statusCode) >= 400
-        ? Number(err.statusCode)
-        : 500;
-
-    const message =
-      status === 500
-        ? "Erro interno do servidor."
-        : err?.message || "Erro na requisição.";
-
-    return res.status(status).json({ message });
-  }
-);
+import { seedPaymentTypes } from "./seeds/paymentTypes.seed";
+import app from "./app";
 
 async function logTableStatus() {
   const queryRunner = AppDataSource.createQueryRunner();
@@ -163,6 +120,8 @@ async function logTableStatus() {
   }
 }
 
+const port = process.env.PORT || 4000;
+
 async function startServer() {
   const maxRetries = 10;
   const retryDelayMs = 3000;
@@ -176,6 +135,14 @@ async function startServer() {
       // Verifica se as tabelas existem
       await logTableStatus();
 
+      // Seed de payment types (idempotente) — só executa se DataSource estiver ok
+      try {
+        await seedPaymentTypes();
+        console.log("✅ Seed de payment types executada.");
+      } catch (seedErr) {
+        console.error("❌ Erro ao executar seed de payment types:", seedErr);
+      }
+      
       app.listen(port, () => {
         console.log(`🚀 Servidor rodando na porta ${port}`);
       });

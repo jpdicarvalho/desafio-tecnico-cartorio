@@ -9,7 +9,9 @@
     "start": "node dist/index.js",
     "migration:run": "node ./node_modules/typeorm/cli.js migration:run -d dist/data-source.js",
     "migration:revert": "node ./node_modules/typeorm/cli.js migration:revert -d dist/data-source.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "cross-env NODE_ENV=test jest --runInBand",
+    "test:ci": "cross-env NODE_ENV=test jest --runInBand",
+    "test:docker": "docker exec -i cartorio-backend sh -c \"npm run test\""
   },
   "keywords": [],
   "author": "",
@@ -28,8 +30,15 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/hapi__joi": "^17.1.15",
+    "@types/jest": "^30.0.0",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.10.1",
+    "@types/supertest": "^6.0.3",
+    "cross-env": "^10.1.0",
+    "jest": "^30.2.0",
+    "sqlite3": "^5.1.7",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.6",
     "ts-node-dev": "^2.0.0",
     "typeorm-ts-node-commonjs": "^0.3.20",
     "typescript": "^5.9.3"
