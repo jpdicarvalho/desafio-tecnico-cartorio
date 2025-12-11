@@ -11,7 +11,7 @@ import "./styles/details.css";
 import "./styles/layout.css";
 
 export const metadata: Metadata = {
-  title: "Cartório 1º ofício de Notas e Registro de Imóveis de Santarém - PA",
+  title: "Cartório 1º Ofício de Notas e Registro de Imóveis de Santarém - PA",
   description:
     "Gestão de pagamentos do Cartório 1º Ofício de Notas e Registro de Imóveis de Santarém - PA",
 };
